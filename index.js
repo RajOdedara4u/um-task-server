@@ -6,7 +6,7 @@ import { config } from "dotenv";
 import errorMiddleware from "./middlewares/error-middleware.js";
 import cors from "cors";
 const coreOptions = {
-  origin: "http://localhost:5173",
+  origin: "https://um-task.netlify.app",
   methoda: "GET , POST , PUT , DELATE , PATCH , HEAD ",
   Credential: true,
 };
