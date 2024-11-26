@@ -14,11 +14,11 @@ const coreOptions = {
 app.use(cors(coreOptions));
 config();
 app.use(e.json());
-app.use("", Userrouter);
+app.use("/api", Userrouter);
 app.use(errorMiddleware);
 
 mongoCD().then(() => {
   app.listen(process.env.PORT, () => {
-    console.log("Running...");
+    console.log("Server Is running On Port", process.env.PORT);
   });
 });

@@ -1,5 +1,4 @@
 import User from "../models/user-model.js";
-import bcrypt from "bcryptjs";
 
 const home = async (req, res) => {
   try {
@@ -12,8 +11,8 @@ const home = async (req, res) => {
 //SEND USER DATA LOGIC---------------------------------------------------------------------------------------------
 const userVerify = async (req, res) => {
   try {
-    const userData = req.user; // accessing the custom data from request
-    return res.status(200).json(userData); // returning data when token is verified
+    const userData = req.user;
+    return res.status(200).json(userData);
   } catch (error) {
     res
       .status(401)
@@ -91,41 +90,20 @@ const login = async (req, res) => {
 };
 
 // Logic For Update User Data
-
 const updateUser = async (req, res) => {
   try {
-    const userId = req.user._id; // Assuming the user ID is available in the request (e.g., from auth middleware)
-
-    // Destructure the values from the request body
-    const { name, email, address, pincode, password } = req.body;
-
-    console.log("At update, received data:", req.body); // Log all the request data
-
-    // Find the user by ID
+    const userId = req.user._id;
+    const { name, email, address, pincode } = req.body;
     const user = await User.findById(userId);
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Update fields if provided in the request body
     if (name) user.name = name;
     if (email) user.email = email;
     if (address) user.address = address;
     if (pincode) user.pincode = pincode;
-
-    // If a password is provided, hash it and update the user password
-    if (password) {
-      try {
-        const salt = await bcrypt.genSalt(10);
-        user.password = await bcrypt.hash(password, salt);
-      } catch (err) {
-        console.error("Error hashing password:", err);
-        return res
-          .status(500)
-          .json({ message: "Error hashing password", error: err.message });
-      }
-    }
 
     // Save the updated user
     const updatedUser = await user.save();

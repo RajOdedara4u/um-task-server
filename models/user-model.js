@@ -2,53 +2,52 @@ import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
-const userSchema = mongoose.Schema({
+const userSchema = new mongoose.Schema({
   name: {
     type: String,
-    require: true,
+    required: true, // Fixed typo
   },
   email: {
     type: String,
-    require: true,
+    required: true, // Fixed typo
+    unique: true, // Ensure unique emails
   },
   password: {
     type: String,
-    require: true,
+    required: true, // Fixed typo
   },
   address: {
     type: String,
-    require: true,
+    required: true, // Fixed typo
   },
   pincode: {
     type: String,
-    require: true,
+    required: true, // Fixed typo
   },
 });
 
-//pre will execute before storing data
+// Pre-save hook to hash password
 userSchema.pre("save", async function (next) {
-  const user = this; // this contain object which contain user values which we have to store
-  if (!user.isModified("password")) {
-    next();
+  if (!this.isModified("password")) {
+    return next(); // Skip if password is not modified
   }
 
   try {
     const salt = await bcrypt.genSalt(10);
-    const hashPassword = await bcrypt.hash(user.password, salt); // converting
-    user.password = hashPassword; // changing real to bcrypted password
+    this.password = await bcrypt.hash(this.password, salt); // Hash password
+    next();
   } catch (error) {
-    next(error);
+    next(error); // Pass error to the next middleware
   }
 });
 
-// JWT token genrator
-userSchema.methods.genrateToken = async function () {
+// JWT token generator
+userSchema.methods.genrateToken = function () {
   try {
     return jwt.sign(
       {
         userId: this._id.toString(),
         email: this.email,
-        isAdmin: this.isAdmin,
       },
       process.env.JWT_SECRET_KEY,
       {
@@ -56,15 +55,15 @@ userSchema.methods.genrateToken = async function () {
       }
     );
   } catch (error) {
-    console.error(error);
+    console.error("Error generating token:", error);
   }
 };
 
-//Password Checking for login route....
+// Password comparison method
 userSchema.methods.checkPassword = async function (password) {
   return bcrypt.compare(password, this.password);
 };
 
-const User = new mongoose.model("User", userSchema);
+const User = mongoose.model("User", userSchema);
 
 export default User;

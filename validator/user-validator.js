@@ -58,12 +58,6 @@ const updateprofileschema = z.object({
     .min(5, { message: "email Required at least 5 characters" })
     .max(255, { message: "Max 255 characters allowed" }),
 
-  password: z
-    .string({ message: "Password Required" })
-    .trim()
-    .min(8, { message: "password Required at least 8 characters" })
-    .max(255, { message: "Max 255 characters allowed" }),
-
   address: z.string().min(1, "Address is required"), // Ensure address is a non-empty string
 
   pincode: z

@@ -1,10 +1,10 @@
 import jwt from "jsonwebtoken";
 import User from "../models/user-model.js";
-const authMiddleware = async (req, res, next) => {
+const middleware = async (req, res, next) => {
   console.log("at middleware", req.body);
 
-  const token = req.header("Authorization"); // Extract token from header
-  const jwttoken = token.replace("Bearer", "").trim(); // Remove Bearer prefix
+  const token = req.header("Authorization"); // get token from header
+  const jwttoken = token.replace("Bearer", "").trim();
 
   try {
     const isVerified = jwt.verify(jwttoken, process.env.JWT_SECRET_KEY); // Verify the token
@@ -12,7 +12,7 @@ const authMiddleware = async (req, res, next) => {
     // Find user and include password
     const userExsit = await User.findOne({
       email: isVerified.email,
-    }); // No `.select()` to include all fields, including password
+    });
 
     if (!userExsit) {
       return res.status(404).send({ message: "User not found" });
@@ -29,4 +29,4 @@ const authMiddleware = async (req, res, next) => {
   }
 };
 
-export default authMiddleware;
+export default middleware;
